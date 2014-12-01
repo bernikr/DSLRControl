@@ -1,4 +1,4 @@
-//#include <Encoder.h>
+#include <Encoder.h>
 #include <Stepper.h>
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
@@ -10,10 +10,11 @@
 #include "Intervalometer.h"
 
 //CONFIG of Pins
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal lcd(12, 11, 8, 7, 6, 5);
 Stepper st(90, 8, 9, 10, 11);
-//Encoder enc(3, 4);
-byte button = 2;
+Encoder enc(3, 4);
+#define buttonpin 2
+#define buttonint 0 //Interrupt 0 ist Pin 2
 
 //Eigene Zeichen
 byte pfeil[8] = {
@@ -37,6 +38,9 @@ byte hohlpfeil[8] = {
   0b00000
 };
 
+//Statusvariable des Buttons
+volatile bool buttonpressed = false;
+
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
 MainMenu mainMenu = MainMenu(&switchScreen, 1, 3);
@@ -58,10 +62,13 @@ void setup() {
   //Einrichten der Schrittmotoren
   st.setSpeed(30);
   
-  //DEV: Serielle Schnittstelle
-  Serial.begin(9600);
+  //Einrichten des Buttons
+  attachInterrupt(buttonint, clicked, RISING);
+  digitalWrite(buttonpin, HIGH); //Internal pullup resistor
+  
   //DEV: LED
   pinMode(13, OUTPUT);
+  
   
   //Delay um Einrichtung des Monitors abzuwarten
   delay(300);
@@ -71,16 +78,16 @@ void loop() {
   scrs[curscr]->loopprocess();
   showScreen(scrs[curscr]);
   
-  //TEST
-  if (Serial.available()) {
-   signed char sertemp;
-   while(Serial.available()){
-     sertemp = Serial.read();
-     if(sertemp == 0)
-       scrs[curscr]->clicked();
-     else
-       scrs[curscr]->input(sertemp);
-   }   
+  //Verarbeitung der Encoder Eingabe
+  if(enc.read()/4 != 0){
+    scrs[curscr]->input(enc.read()/4);
+    enc.write(0);
+  }
+  
+  //Verarbeitung der Buttoneingabe
+  if(buttonpressed){
+    buttonpressed = false;
+    scrs[curscr]->clicked();
   }
 
   delay(100);
@@ -101,4 +108,8 @@ void switchScreen(byte newscrnum){
 
 void triggerCamera(bool t){
   digitalWrite(13, t);
+}
+
+void clicked(){
+  buttonpressed = true;
 }
