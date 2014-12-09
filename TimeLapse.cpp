@@ -1,8 +1,9 @@
 #include "TimeLapse.h"
 
-TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), byte nposInArray){
+TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), void (*nMov)(byte), byte nposInArray){
   swScr = nswScr;
   trigg = nTrigg;
+  mov = nMov;
   
   posInArray = nposInArray;
   
@@ -12,15 +13,10 @@ TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), byte nposInArra
 
 char* TimeLapse::getLine(byte line){
   //Zuweisen der Anzeige zu temptxt (Aufteilung der Millisekundenzahl in H,m,s und hundertstel
-  if(line == 0){
-    byte hours = time/1000/60/60;
-    byte minutes = (time/1000/60)%60;
-    byte seconds = (time/1000)%60;
-    byte centiseconds = (time/10)%100;
-    
-    snprintf(temptxt, 17, "   %1u:%02u:%02u.%02u", hours, minutes, seconds, centiseconds);
-  }else if(!paused) //Darstellen von Pause und Resume
-    strcpy(temptxt,"     Pauselol  ");
+  if(line == 0)
+    snprintf(temptxt, 17, " T:%03u  S:%+04i", time, steps);
+  else if(!paused) //Darstellen von Pause und Resume
+    strcpy(temptxt,"     Pause  ");
   else
     strcpy(temptxt,"     Resume    X");
   
@@ -56,20 +52,29 @@ void TimeLapse::input(int b){
 void TimeLapse::start(short ntime, short nsteps){
   swScr(posInArray);    //Anzeigen des Intervalometers
   pos = 0;              //Setzen des Cursers auf 0 um unschöne Bugs zu vermeiden
-  time = ntime;         //Zuweisen der zu belichtenden Zeit
-  lasttime = millis();  //Starte timer
+  consttime = ntime;    //Zuweisen der zu belichtenden Zeit
+  conststeps = nsteps;  //Zuweisen der Schritte
   paused = false;       //Verhindern das der Timer gepaused startet
-  trigg(true);          //Starten der Belichtung
+  newloop();
 }
 
 void TimeLapse::loopprocess(){
-  /*if(!paused){
+  if(!paused){
     long tempmill = millis();
-    time -= (tempmill - lasttime);  //füge zeitdiffernz zu
-    lasttime = tempmill;
-    if(time < 0){  //Wenn aus
-      trigg(false);
-      swScr(posInArray - 1);
+    if((tempmill - lasttime) >= 1000){ //Wenn eine Sekunde vergangen ist
+      time -= (tempmill - lasttime)/1000;       //ziehe diese von time ab
+      lasttime += (tempmill - lasttime)/1000*1000;   //und füge sie lasttime hinzu
     }
-  }*/
+    if(time < 0){  //Wenn die Zeit aus ist
+        trigg(false);
+        newloop();
+    }
+  }
+}
+
+void TimeLapse::newloop(){
+  time = consttime;     //zurücksetzten der time Variable
+  steps = conststeps;   //zurücksetzten der steps Variable
+  lasttime = millis();  //Starte timer
+  trigg(true);          //Starten der Belichtung
 }

@@ -40,7 +40,7 @@ byte hohlpfeil[8] = {
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
 MainMenu mainMenu = MainMenu(&switchScreen, 1, 3);
-TimeLapse timeLap = TimeLapse(&switchScreen, &triggerCamera, 2);
+TimeLapse timeLap = TimeLapse(&switchScreen, &triggerCamera, &moveStepper, 2);
 TimeLapseOptions timeLapOpt = TimeLapseOptions(&switchScreen, &EEPROMReadInt, &EEPROMWriteInt, &timeLap);
 Intervalometer interv = Intervalometer(&switchScreen, &triggerCamera, 4);
 IntervalometerOptions intervOpt = IntervalometerOptions(&switchScreen, &EEPROMReadLong, &EEPROMWriteLong, &interv);
@@ -101,4 +101,7 @@ void switchScreen(byte newscrnum){
 
 void triggerCamera(bool t){
   digitalWrite(13, t);
+}
+
+void moveStepper(byte steps){
 }

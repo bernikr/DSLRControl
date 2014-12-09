@@ -11,14 +11,18 @@ class TimeLapse : public Screen{
     char pos;             //Aktuelle Curserposition
     short time;           //Aktuelle Zeit
     short steps;          //Akutelle Steps
+    short consttime;      //Eingestellte Zeit
+    short conststeps;     //Eingestellte Steps
     char* temptxt;        //Variable zum Speichern des Ausgabetextes (Pointer wird von getline zurückgegeben)
     void (*swScr)(byte);  //Funktionspointer zum Darstellen eines anderen Screens
     void (*trigg)(bool);  //Funktionspointer zum Auslösen der Kamera
+    void (*mov)(byte);    //Funktionspointer zum Bewegen des Schrittmotors
     bool paused;          //Läuft der Timer: True = Timer angehalten, False = Timer läuft
     byte posInArray;      //Die Position dieses Bildschirmes im Array (Wird von Start gebraucht, posInArray - 1 sollten die zugehörigen Optionen sein
     long lasttime;        //Zeit in Millisecunden beim Letzen loopdurchlauf (Wird für differez gebraucht)
+    void newloop();       //Startet einen neuen Durchlauf mit Belichtung und Bewegung
   public:
-    TimeLapse(void (byte), void (bool), byte);  //Parameter: showScreen pointer, Camera trigger Pointer, Eigene Position im Array
+    TimeLapse(void (byte), void (bool), void (byte), byte);  //Parameter: showScreen pointer, Camera trigger Pointer, Stepper mover Pointer, Eigene Position im Array
     char* getLine(byte);
     void clicked();
     void input(int);
