@@ -37,6 +37,7 @@ void TimeLapseOptions::clicked(){
       break;
     case 2:
       timeLap->start(time, steps);
+      break;
     case 3:
       save(SAV_LOC, time);
       save(SAV_LOC + 2, steps);
