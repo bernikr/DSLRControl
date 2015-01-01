@@ -10,11 +10,15 @@
 #include "Intervalometer.h"
 
 //CONFIG of Pins
-LiquidCrystal lcd(12, 11, 8, 7, 6, 5);
-Stepper st(90, 8, 9, 10, 11);
+LiquidCrystal lcd(7, 8, A3, A2, A1, A0);
+Stepper st(90, 10, 11, A4, A5);
 Encoder enc(3, 4);
 #define buttonpin 2
 #define buttonint 0 //Interrupt 0 ist Pin 2
+#define camerapin 12
+#define redled 6
+#define greenled 5
+#define backlight 9
 
 //Eigene Zeichen
 byte pfeil[8] = {
@@ -66,8 +70,8 @@ void setup() {
   attachInterrupt(buttonint, clicked, RISING);
   digitalWrite(buttonpin, HIGH); //Internal pullup resistor
   
-  //DEV: LED
-  pinMode(13, OUTPUT);
+  //Kamera Pin
+  pinMode(camerapin, OUTPUT);
   
   //Delay um Einrichtung des Monitors abzuwarten
   delay(300);
@@ -106,7 +110,7 @@ void switchScreen(byte newscrnum){
 }
 
 void triggerCamera(bool t){
-  digitalWrite(13, t);
+  digitalWrite(camerapin, t);
 }
 
 void clicked(){
