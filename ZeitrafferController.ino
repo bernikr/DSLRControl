@@ -83,7 +83,7 @@ void loop() {
   
   //Verarbeitung der Encoder Eingabe
   if(enc.read()/4 != 0){
-    scrs[curscr]->input(enc.read()/4);
+    scrs[curscr]->input(-enc.read()/4);
     enc.write(0);
   }
   
