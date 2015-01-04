@@ -16,8 +16,8 @@ Encoder enc(3, 4);
 #define buttonpin 2
 #define buttonint 0 //Interrupt 0 ist Pin 2
 #define camerapin 12
-#define redled 6
-#define greenled 5
+#define redled 5
+#define greenled 6
 #define backlight 9
 
 //Eigene Zeichen
@@ -76,8 +76,15 @@ void setup() {
   //Kamera Pin
   pinMode(camerapin, OUTPUT);
   
+  //Leds as output
+  pinMode(redled, OUTPUT);
+  pinMode(greenled, OUTPUT);
+  
   //Delay um Einrichtung des Monitors abzuwarten
   delay(300);
+  
+  //Aktiviere Rote LED
+  digitalWrite(redled, HIGH);
 }
 
 void loop() {
@@ -113,6 +120,8 @@ void switchScreen(byte newscrnum){
 }
 
 void triggerCamera(bool t){
+  digitalWrite(greenled, t);
+  digitalWrite(redled, !t);
   digitalWrite(camerapin, t);
 }
 
