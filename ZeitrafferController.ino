@@ -45,8 +45,8 @@ byte hohlpfeil[8] = {
 //Statusvariable des Buttons
 volatile bool buttonpressed = false;
 
-//Erster Buttonclick erfolgt (interrupt feuert gleich)
-volatile bool notfirstpress = false;
+//Ist startup delay abgelaufen
+bool afterstartup = false;
 
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
@@ -82,6 +82,9 @@ void setup() {
   
   //Delay um Einrichtung des Monitors abzuwarten
   delay(300);
+  
+  //Startup abgeschlossen
+  afterstartup = true;
   
   //Aktiviere Rote LED
   digitalWrite(redled, HIGH);
@@ -126,10 +129,7 @@ void triggerCamera(bool t){
 }
 
 void clicked(){
-  if(notfirstpress)
-    buttonpressed = true;
-  else
-    notfirstpress = true;
+  if(afterstartup) buttonpressed = true;
 }
 
 void moveStepper(byte steps){
