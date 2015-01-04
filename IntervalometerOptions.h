@@ -6,9 +6,9 @@
 #include "Intervalometer.h"
 
 class IntervalometerOptions : public Screen{
-  #define POS_NUM 6
+  #define POS_NUM 7
   private:
-    const byte positions[POS_NUM] = {2, 4, 7, 10, 17, 24}; //Mögliche Positionen des Cursers
+    const byte positions[POS_NUM] = {2, 4, 7, 10, 17, 24, 30}; //Mögliche Positionen des Cursers
     char pos;                  //Aktuelle Position des Cursers
     bool sel;                  //Zustand des Cursers (True = ausgewählt)
     long time;                 //Aktuell ausgewälte Zeit
