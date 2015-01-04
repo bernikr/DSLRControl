@@ -3,9 +3,6 @@
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
 
-#include "MainMenu.h"
-#include "TimeLapseOptions.h"
-#include "TimeLapse.h"
 #include "IntervalometerOptions.h"
 #include "Intervalometer.h"
 
@@ -50,13 +47,10 @@ volatile bool notfirstpress = false;
 
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
-MainMenu mainMenu = MainMenu(&switchScreen, 1, 3);
-TimeLapse timeLap = TimeLapse(&switchScreen, &triggerCamera, &moveStepper, 2);
-TimeLapseOptions timeLapOpt = TimeLapseOptions(&switchScreen, &EEPROMReadInt, &EEPROMWriteInt, &timeLap);
-Intervalometer interv = Intervalometer(&switchScreen, &triggerCamera, 4);
+Intervalometer interv = Intervalometer(&switchScreen, &triggerCamera, 1);
 IntervalometerOptions intervOpt = IntervalometerOptions(&switchScreen, &EEPROMReadLong, &EEPROMWriteLong, &interv);
 //Zusammenfassen der Screens in einem Screen-Pointer Array
-Screen *scrs[5] = {&mainMenu, &timeLapOpt, &timeLap, &intervOpt, &interv};
+Screen *scrs[2] = {&intervOpt, &interv};
 //Statusvariable des Aktuellen Screens im Array
 byte curscr = 0;
 
@@ -121,7 +115,4 @@ void clicked(){
     buttonpressed = true;
   else
     notfirstpress = true;
-}
-
-void moveStepper(byte steps){
 }
