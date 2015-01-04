@@ -24,7 +24,7 @@ char* IntervalometerOptions::getLine(byte line){
     
     snprintf(temptxt, 17, "   %1u:%02u:%02u.%02u", hours, minutes, seconds, centiseconds);
   }else
-    strcpy(temptxt,"  Start  Save  X");
+    strcpy(temptxt,"  Start  Save   ");
   
   //Anzeigen des Cursors
   if(positions[pos]/16 == line)
