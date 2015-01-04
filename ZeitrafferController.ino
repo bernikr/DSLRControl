@@ -45,6 +45,9 @@ byte hohlpfeil[8] = {
 //Statusvariable des Buttons
 volatile bool buttonpressed = false;
 
+//Erster Buttonclick erfolgt (interrupt feuert gleich)
+volatile bool notfirstpress = false;
+
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
 MainMenu mainMenu = MainMenu(&switchScreen, 1, 3);
@@ -114,7 +117,10 @@ void triggerCamera(bool t){
 }
 
 void clicked(){
-  buttonpressed = true;
+  if(notfirstpress)
+    buttonpressed = true;
+  else
+    notfirstpress = true;
 }
 
 void moveStepper(byte steps){
