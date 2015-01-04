@@ -1,19 +1,21 @@
-//#include <Encoder.h>
+#include <Encoder.h>
 #include <Stepper.h>
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
 
-#include "MainMenu.h"
-#include "TimeLapseOptions.h"
-#include "TimeLapse.h"
 #include "IntervalometerOptions.h"
 #include "Intervalometer.h"
 
 //CONFIG of Pins
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
-Stepper st(90, 8, 9, 10, 11);
-//Encoder enc(3, 4);
-byte button = 2;
+LiquidCrystal lcd(7, 8, A3, A2, A1, A0);
+Stepper st(90, 10, 11, A4, A5);
+Encoder enc(3, 4);
+#define buttonpin 2
+#define buttonint 0 //Interrupt 0 ist Pin 2
+#define camerapin 12
+#define redled 6
+#define greenled 5
+#define backlight 9
 
 //Eigene Zeichen
 byte pfeil[8] = {
@@ -37,15 +39,18 @@ byte hohlpfeil[8] = {
   0b00000
 };
 
+//Statusvariable des Buttons
+volatile bool buttonpressed = false;
+
+//Erster Buttonclick erfolgt (interrupt feuert gleich)
+volatile bool notfirstpress = false;
+
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
-MainMenu mainMenu = MainMenu(&switchScreen, 1, 3);
-TimeLapse timeLap = TimeLapse(&switchScreen, &triggerCamera, 2);
-TimeLapseOptions timeLapOpt = TimeLapseOptions(&switchScreen, &EEPROMReadInt, &EEPROMWriteInt, &timeLap);
-Intervalometer interv = Intervalometer(&switchScreen, &triggerCamera, 4);
+Intervalometer interv = Intervalometer(&switchScreen, &triggerCamera, 1);
 IntervalometerOptions intervOpt = IntervalometerOptions(&switchScreen, &EEPROMReadLong, &EEPROMWriteLong, &interv);
 //Zusammenfassen der Screens in einem Screen-Pointer Array
-Screen *scrs[5] = {&mainMenu, &timeLapOpt, &timeLap, &intervOpt, &interv};
+Screen *scrs[2] = {&intervOpt, &interv};
 //Statusvariable des Aktuellen Screens im Array
 byte curscr = 0;
 
@@ -58,10 +63,12 @@ void setup() {
   //Einrichten der Schrittmotoren
   st.setSpeed(30);
   
-  //DEV: Serielle Schnittstelle
-  Serial.begin(9600);
-  //DEV: LED
-  pinMode(13, OUTPUT);
+  //Einrichten des Buttons
+  attachInterrupt(buttonint, clicked, RISING);
+  digitalWrite(buttonpin, HIGH); //Internal pullup resistor
+  
+  //Kamera Pin
+  pinMode(camerapin, OUTPUT);
   
   //Delay um Einrichtung des Monitors abzuwarten
   delay(300);
@@ -71,16 +78,16 @@ void loop() {
   scrs[curscr]->loopprocess();
   showScreen(scrs[curscr]);
   
-  //TEST
-  if (Serial.available()) {
-   signed char sertemp;
-   while(Serial.available()){
-     sertemp = Serial.read();
-     if(sertemp == 0)
-       scrs[curscr]->clicked();
-     else
-       scrs[curscr]->input(sertemp);
-   }   
+  //Verarbeitung der Encoder Eingabe
+  if(enc.read()/4 != 0){
+    scrs[curscr]->input(-enc.read()/4);
+    enc.write(0);
+  }
+  
+  //Verarbeitung der Buttoneingabe
+  if(buttonpressed){
+    buttonpressed = false;
+    scrs[curscr]->clicked();
   }
 
   delay(100);
@@ -100,5 +107,12 @@ void switchScreen(byte newscrnum){
 }
 
 void triggerCamera(bool t){
-  digitalWrite(13, t);
+  digitalWrite(camerapin, t);
+}
+
+void clicked(){
+  if(notfirstpress)
+    buttonpressed = true;
+  else
+    notfirstpress = true;
 }
