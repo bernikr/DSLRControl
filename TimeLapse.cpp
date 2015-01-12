@@ -33,7 +33,6 @@ void TimeLapse::clicked(){
     case 0:  //Pause/Resume verarbeiten
       paused = !paused;
       lasttime = millis();
-      trigg(!paused);
       break;
     case 1:  //Exit zo Options
       swScr(posInArray - 1);
@@ -59,16 +58,18 @@ void TimeLapse::start(short ntime, short nsteps){
 }
 
 void TimeLapse::loopprocess(){
+  long tempmill = millis();
   if(!paused){
-    long tempmill = millis();
     if((tempmill - lasttime) >= 1000){ //Wenn eine Sekunde vergangen ist
       time -= (tempmill - lasttime)/1000;       //ziehe diese von time ab
       lasttime += (tempmill - lasttime)/1000*1000;   //und füge sie lasttime hinzu
     }
-    if(time < 0){  //Wenn die Zeit aus ist
-        trigg(false);
-        newloop();
-    }
+  }
+  if(time <= 0){  //Wenn die Zeit aus ist
+    newloop();
+  }
+  if((starttime + TRMILLIS) < tempmill){
+    trigg(false);
   }
 }
 
@@ -76,5 +77,6 @@ void TimeLapse::newloop(){
   time = consttime;     //zurücksetzten der time Variable
   steps = conststeps;   //zurücksetzten der steps Variable
   lasttime = millis();  //Starte timer
+  starttime = lasttime;
   trigg(true);          //Starten der Belichtung
 }

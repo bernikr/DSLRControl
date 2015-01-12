@@ -6,6 +6,7 @@
 
 class TimeLapse : public Screen{
   #define POS_NUM 2
+  #define TRMILLIS 100
   private:
     const byte positions[POS_NUM] = {20,  30};  //Mögliche Curserpositionen
     char pos;             //Aktuelle Curserposition
@@ -20,6 +21,7 @@ class TimeLapse : public Screen{
     bool paused;          //Läuft der Timer: True = Timer angehalten, False = Timer läuft
     byte posInArray;      //Die Position dieses Bildschirmes im Array (Wird von Start gebraucht, posInArray - 1 sollten die zugehörigen Optionen sein
     long lasttime;        //Zeit in Millisecunden beim Letzen loopdurchlauf (Wird für differez gebraucht)
+    long starttime;       //Zeit in Millisekunden beim starten der letzten loop;
     void newloop();       //Startet einen neuen Durchlauf mit Belichtung und Bewegung
   public:
     TimeLapse(void (byte), void (bool), void (byte), byte);  //Parameter: showScreen pointer, Camera trigger Pointer, Stepper mover Pointer, Eigene Position im Array
