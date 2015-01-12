@@ -1,9 +1,10 @@
 #include "TimeLapse.h"
 
-TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), void (*nMov)(byte), byte nposInArray){
+TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), void (*nMov)(byte), void (*nready)(bool), byte nposInArray){
   swScr = nswScr;
   trigg = nTrigg;
   mov = nMov;
+  rState = nready;
   
   posInArray = nposInArray;
   
@@ -33,6 +34,7 @@ void TimeLapse::clicked(){
     case 0:  //Pause/Resume verarbeiten
       paused = !paused;
       lasttime = millis();
+      rState(!paused);
       break;
     case 1:  //Exit zo Options
       swScr(posInArray - 1);
@@ -54,6 +56,7 @@ void TimeLapse::start(short ntime, short nsteps){
   consttime = ntime;    //Zuweisen der zu belichtenden Zeit
   conststeps = nsteps;  //Zuweisen der Schritte
   paused = false;       //Verhindern das der Timer gepaused startet
+  rState(true);
   newloop();
 }
 

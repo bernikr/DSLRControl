@@ -42,6 +42,9 @@ byte hohlpfeil[8] = {
   0b00000
 };
 
+//Statusvariable des Gelben Zustands
+boolean rState = false;
+
 //Statusvariable des Buttons
 volatile bool buttonpressed = false;
 
@@ -51,7 +54,7 @@ bool afterstartup = false;
 ////Screens
 //Erstellen der Verschiedenen Screen-Objekte
 MainMenu mainMenu = MainMenu(&switchScreen, 1, 3);
-TimeLapse timeLap = TimeLapse(&switchScreen, &triggerCamera, &moveStepper, 2);
+TimeLapse timeLap = TimeLapse(&switchScreen, &triggerCamera, &moveStepper, &readyState, 2);
 TimeLapseOptions timeLapOpt = TimeLapseOptions(&switchScreen, &EEPROMReadInt, &EEPROMWriteInt, &timeLap);
 Intervalometer interv = Intervalometer(&switchScreen, &triggerCamera, 4);
 IntervalometerOptions intervOpt = IntervalometerOptions(&switchScreen, &EEPROMReadLong, &EEPROMWriteLong, &interv);
@@ -123,9 +126,15 @@ void switchScreen(byte newscrnum){
 }
 
 void triggerCamera(bool t){
-  digitalWrite(greenled, t);
+  digitalWrite(greenled, t || rState);
   digitalWrite(redled, !t);
   digitalWrite(camerapin, t);
+}
+
+void readyState(bool s){
+  rState = s;
+  digitalWrite(greenled, s);
+  digitalWrite(redled, true);
 }
 
 void clicked(){
