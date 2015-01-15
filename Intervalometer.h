@@ -4,25 +4,26 @@
 #include <Arduino.h>
 #include "Screen.h"
 
-class Intervalometer : public Screen{
-  #define POS_NUM 2
+#define POS_NUM 2 //Number of curser positions
+
+class Intervalometer : public Screen {
   private:
-    const byte positions[POS_NUM] = {20,  30};  //Mögliche Curserpositionen
-    char pos;             //Aktuelle Curserposition
-    long time;            //Aktuelle Zeit
-    char* temptxt;        //Variable zum Speichern des Ausgabetextes (Pointer wird von getline zurückgegeben)
-    void (*swScr)(byte);  //Funktionspointer zum Darstellen eines anderen Screens
-    void (*trigg)(bool);  //Funktionspointer zum Auslösen der Kamera
-    bool paused;          //Läuft der Timer: True = Timer angehalten, False = Timer läuft
-    byte posInArray;      //Die Position dieses Bildschirmes im Array (Wird von Start gebraucht, posInArray - 1 sollten die zugehörigen Optionen sein
-    long lasttime;        //Zeit in Millisecunden beim Letzen loopdurchlauf (Wird für differez gebraucht)
+    const byte positions[POS_NUM] = {20,  30};  //possible curser positions
+    char pos;             //curser position at the moment
+    long time;            //remaining time
+    char* temptxt;        //variable to save the output line
+    void (*swScr)(byte);  //Function pointer to display another screen
+    void (*trigg)(bool);  //Function pointer to trigger the camera
+    bool paused;          //is the timer paused?
+    byte posInArray;      //The Position of this screen in the array (Is needed by start(), posInArray - 1 must be the InvervalometerOptions)
+    long lasttime;        //Time in ms at the last loop
   public:
-    Intervalometer(void (byte), void (bool), byte);  //Parameter: showScreen pointer, Camera trigger Pointer, Eigene Position im Array
+    Intervalometer(void (byte), void (bool), byte);  //Parameters: showScreen pointer, camera trigger pointer, own position in array
     char* getLine(byte);
     void clicked();
     void input(int);
     void loopprocess();
-    void start(long);     //Funktion, welche zum Starten des Timers von den Optionen aufgerufen wird.
+    void start(long);     //start the timer (called by the options)
 };
 
 #endif
