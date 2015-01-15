@@ -1,85 +1,82 @@
 #include "TimeLapse.h"
 
-TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), void (*nMov)(byte), void (*nready)(bool), byte nposInArray){
+TimeLapse::TimeLapse(void (*nswScr)(byte), void (*nTrigg)(bool), void (*nMov)(byte), void (*nready)(bool), byte nposInArray) {
   swScr = nswScr;
   trigg = nTrigg;
   mov = nMov;
   rState = nready;
-  
+
   posInArray = nposInArray;
-  
+
   temptxt = new char[17];
 }
 
 
-char* TimeLapse::getLine(byte line){
-  //Zuweisen der Anzeige zu temptxt (Aufteilung der Millisekundenzahl in H,m,s und hundertstel
-  if(line == 0)
+char* TimeLapse::getLine(byte line) {
+  if (line == 0)
     snprintf(temptxt, 17, " T:%03u  S:%+04i", time, steps);
-  else if(!paused) //Darstellen von Pause und Resume
-    strcpy(temptxt,"     Pause  ");
+  else if (!paused) //Darstellen von Pause und Resume
+    strcpy(temptxt, "     Pause  ");
   else
-    strcpy(temptxt,"     Resume    X");
-  
-  //Anzeigen des Cursors
-  if(positions[pos]/16 == line)
+    strcpy(temptxt, "     Resume    X");
+
+  //cursor
+  if (positions[pos] / 16 == line)
     temptxt[positions[pos] % 16] = 1;
-    
+
   return temptxt;
 }
 
-//Verarbeitung der Clickevents
-void TimeLapse::clicked(){
-  switch(pos){
-    case 0:  //Pause/Resume verarbeiten
+void TimeLapse::clicked() {
+  switch (pos) {
+    case 0:
       paused = !paused;
       lasttime = millis();
       rState(!paused);
       break;
-    case 1:  //Exit zo Options
+    case 1:
       swScr(posInArray - 1);
       break;
   }
 }
 
-//Verarbeitung der Encoderdrehund
-void TimeLapse::input(int b){
-  if(paused) //Wenn Pausiert 0 und 1 möglich, sonst nur 0
-    pos = ((pos + b) % POS_NUM + POS_NUM) % POS_NUM; //Hässliche Lösung um einen Positiven Modulo zu erhalten.
+void TimeLapse::input(int b) {
+  if (paused)
+    pos = ((pos + b) % POS_NUM + POS_NUM) % POS_NUM;
   else
     pos = 0;
 }
 
-void TimeLapse::start(short ntime, short nsteps){
-  swScr(posInArray);    //Anzeigen des Intervalometers
-  pos = 0;              //Setzen des Cursers auf 0 um unschöne Bugs zu vermeiden
-  consttime = ntime;    //Zuweisen der zu belichtenden Zeit
-  conststeps = nsteps;  //Zuweisen der Schritte
-  paused = false;       //Verhindern das der Timer gepaused startet
+void TimeLapse::start(short ntime, short nsteps) {
+  swScr(posInArray);    //show the time lapse
+  pos = 0;              //reset cursor pos
+  consttime = ntime;
+  conststeps = nsteps;
+  paused = false;
   rState(true);
   newloop();
 }
 
-void TimeLapse::loopprocess(){
+void TimeLapse::loopprocess() {
   long tempmill = millis();
-  if(!paused){
-    if((tempmill - lasttime) >= 1000){ //Wenn eine Sekunde vergangen ist
-      time -= (tempmill - lasttime)/1000;       //ziehe diese von time ab
-      lasttime += (tempmill - lasttime)/1000*1000;   //und füge sie lasttime hinzu
+  if (!paused) {
+    if ((tempmill - lasttime) >= 1000) { //If a second is over
+      time -= (tempmill - lasttime) / 1000;     //subtract it from time
+      lasttime += (tempmill - lasttime) / 1000 * 1000; //and add it to lasttime
     }
   }
-  if(time <= 0){  //Wenn die Zeit aus ist
+  if (time <= 0) { //when the time is over
     newloop();
   }
-  if((starttime + TRMILLIS) < tempmill){
+  if ((starttime + TRMILLIS) < tempmill) { //end the exposure after TRMILLIS
     trigg(false);
   }
 }
 
-void TimeLapse::newloop(){
-  time = consttime;     //zurücksetzten der time Variable
-  steps = conststeps;   //zurücksetzten der steps Variable
-  lasttime = millis();  //Starte timer
+void TimeLapse::newloop() {
+  time = consttime;     //reset time
+  steps = conststeps;   //reset steps
+  lasttime = millis();  //start timer
   starttime = lasttime;
-  trigg(true);          //Starten der Belichtung
+  trigg(true);          //start the exposure
 }

@@ -4,18 +4,18 @@
 #include <Arduino.h>
 #include "Screen.h"
 
-class MainMenu : public Screen{
+class MainMenu : public Screen {
   private:
-    void (*swScr)(byte);  //Funktionspointer zum Aufrufen anderer Bildschrime
-    byte scrnum[2];       //Stellen der aufzurufenden Bildschrime im Array - Array
-    bool mode;            //Aktuell selectierter Punkt (false = obere line)
-    char* temptxt;        //Variable zum Speichern des Ausgabetextes (Pointer wird von getline zurückgegeben)
+    void (*swScr)(byte);  //Function pointer to display other screens
+    byte scrnum[2];       //Positions of the optionsscreens in the array
+    bool mode;            //selected mode (false = upper line)
+    char* temptxt;        //variable to save the output line
   public:
-    MainMenu(void (byte), byte, byte); //Parameter:  showScreen pointer, Position des Ersten Screens im Array, Position des zweiten Screens
+    MainMenu(void (byte), byte, byte); //Parameters:  showScreen pointer, position of the first screen in the array, position of the second screen
     char* getLine(byte);
     void clicked();
     void input(int);
-    void loopprocess(){}
+    void loopprocess() {}
 };
 
 #endif

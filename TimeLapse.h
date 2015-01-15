@@ -4,33 +4,33 @@
 #include <Arduino.h>
 #include "Screen.h"
 
-class TimeLapse : public Screen{
-  #define POS_NUM 2
-  #define TRMILLIS 100
+class TimeLapse : public Screen {
+#define POS_NUM 2
+#define TRMILLIS 100
   private:
-    const byte positions[POS_NUM] = {20,  30};  //Mögliche Curserpositionen
-    char pos;             //Aktuelle Curserposition
-    short time;           //Aktuelle Zeit
-    short steps;          //Akutelle Steps
-    short consttime;      //Eingestellte Zeit
-    short conststeps;     //Eingestellte Steps
-    char* temptxt;        //Variable zum Speichern des Ausgabetextes (Pointer wird von getline zurückgegeben)
-    void (*swScr)(byte);  //Funktionspointer zum Darstellen eines anderen Screens
-    void (*trigg)(bool);  //Funktionspointer zum Auslösen der Kamera
-    void (*mov)(byte);    //Funktionspointer zum Bewegen des Schrittmotors
-    void (*rState)(bool);
-    bool paused;          //Läuft der Timer: True = Timer angehalten, False = Timer läuft
-    byte posInArray;      //Die Position dieses Bildschirmes im Array (Wird von Start gebraucht, posInArray - 1 sollten die zugehörigen Optionen sein
-    long lasttime;        //Zeit in Millisecunden beim Letzen loopdurchlauf (Wird für differez gebraucht)
-    long starttime;       //Zeit in Millisekunden beim starten der letzten loop;
-    void newloop();       //Startet einen neuen Durchlauf mit Belichtung und Bewegung
+    const byte positions[POS_NUM] = {20,  30}; 
+    char pos;
+    short time;
+    short steps;
+    short consttime;
+    short conststeps;
+    char* temptxt;
+    void (*swScr)(byte);
+    void (*trigg)(bool);  //function pointer to trigger camera
+    void (*mov)(byte);    //function pointer to move stepper
+    void (*rState)(bool); //function pointer to aktivate yellow state
+    bool paused;
+    byte posInArray;
+    long lasttime;
+    long starttime;
+    void newloop();
   public:
-    TimeLapse(void (byte), void (bool), void (byte), void (bool), byte);  //Parameter: showScreen pointer, Camera trigger Pointer, Stepper mover Pointer, readyState Pointer, Eigene Position im Array
+    TimeLapse(void (byte), void (bool), void (byte), void (bool), byte);  //Parameters: showScreen pointer, camera trigger pointer, stepper mover pointer, readyState pointer, own position in array
     char* getLine(byte);
     void clicked();
     void input(int);
     void loopprocess();
-    void start(short, short);     //Funktion, welche zum Starten des Timers von den Optionen aufgerufen wird. Parameter: time, steps
+    void start(short, short);     //function to start the time lapse, Parameters: time, steps
 };
 
 #endif
