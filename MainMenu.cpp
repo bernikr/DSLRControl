@@ -11,7 +11,7 @@ MainMenu::MainMenu(void (*nswScr)(byte), byte scrnum1, byte scrnum2){
 char* MainMenu::getLine(byte line){
   //Zuweisen der Anzeige zu temptxt
   if(line == 0)
-    strcpy(temptxt," Zeitrafferst.");
+    strcpy(temptxt," Time Lapse.");
   else
     strcpy(temptxt," Interval.");
   
