@@ -6,7 +6,7 @@
 
 class TimeLapse : public Screen {
 #define POS_NUM 2
-#define TRMILLIS 100
+#define TRMILLIS 250
   private:
     const byte positions[POS_NUM] = {20,  30}; 
     char pos;
